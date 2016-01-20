@@ -9,9 +9,8 @@ TestObserver testObserver;
 DeviceRegistry registry;
 Cell[][] grid;
 
-OscP5 oscP5;  // send messages 
-NetAddress myRemoteLocation;  // where we send to
-
+OscP5 oscP5;   
+NetAddress myRemoteLocation;
 
 int rows;
 int cols;
@@ -73,7 +72,7 @@ void draw() {
      */
 
     // this should just scrape the color from the displayed grid
-    // will set the colors initially with display() then again wtih update() on OSC event
+    // will set the colors initially with display() then again with update() on OSC event
     registry.startPushing();
     List<Strip> strips = registry.getStrips();
     int numStrips = strips.size();
@@ -93,10 +92,18 @@ void draw() {
 
 
 
-
-
-
+// Need to establish OSC protocol
+// Strip, pixels, colors
+// Set grid squares to matching numbers
 public void oscEvent(OscMessage theOscMessage) {
+  List<Integer> pixelArr = new ArrayList<Integer>();
+  for (int i = 0; i < theOscMessage.arguments().length; i++) {
+   int n = (Integer) theOscMessage.arguments()[i];
+   pixelArr.add(n);
+  }
+  println("////////////////////");
+  println(pixelArr);
+  println("////////////////////");
 }
 
 
