@@ -19,12 +19,15 @@ int cols;
 
 
 void setup() {
-  size(1280, 480);
 
+  size(1280, 480);
   registry = new DeviceRegistry();
   testObserver = new TestObserver();
   registry.addObserver(testObserver);
   prepareExitHandler();
+
+  oscP5 = new OscP5(this, 5001);
+  myRemoteLocation = new NetAddress("127.0.0.1", 5001);
 }
 
 
@@ -35,17 +38,17 @@ public void gridSetup() {
     cols = strip.getLength();
     rows = strips.size();
   }
-  //cols = 100;
-  //rows = 3;
-  // println("====================================");
-  //println(width/cols + ", " + height/rows);
-  
-  color gridfill = color(125);
+
+  /* Offline mode
+   cols = 100;
+   rows = 3;
+   */
+
   grid = new Cell[cols][rows];
 
   for (int i = 0; i < rows; i++) {
     for (int j = 0; j < cols; j++) {
-      grid[j][i] = new Cell(j*(width/cols), i*(width/cols), width/cols, width/cols, gridfill);
+      grid[j][i] = new Cell(j*(width/cols), i*(width/cols), width/cols, width/cols, #000000);
     }
   }
 }
@@ -54,8 +57,8 @@ public void gridSetup() {
 
 
 void draw() {
-  background(0);
-  
+  background(#000000);
+
   if (testObserver.hasStrips) {
     gridSetup();
     for (int i = 0; i < rows; i ++ ) {     
@@ -63,19 +66,26 @@ void draw() {
         grid[j][i].display();
       }
     }
-    
+
     /*
     color testcol = color(255, 0, 0);
-    grid[j][i].update(testcol);
-    */
-    
+     grid[j][i].update(testcol);
+     */
+
+    // this should just scrape the color from the displayed grid
+    // will set the colors initially with display() then again wtih update() on OSC event
     registry.startPushing();
     List<Strip> strips = registry.getStrips();
     int numStrips = strips.size();
+
     for (Strip strip : strips) {
       int xscale = width/numStrips;
       for (int stripx = 0; stripx < strip.getLength(); stripx++) {
-        strip.setPixel(125, stripx);
+        for (int i = 0; i < rows; i ++ ) {     
+          for (int j = 0; j < cols; j ++ ) {
+            strip.setPixel(grid[j][i].col, stripx);
+          }
+        }
       }
     }
   }

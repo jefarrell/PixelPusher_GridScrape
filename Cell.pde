@@ -1,12 +1,10 @@
 class Cell {
-
-
   float x, y;
   float w, h;
   float angle;
   color col;
-
-  // Cell Constructor
+  int offset = 20;
+  
   Cell(float tempX, float tempY, float tempW, float tempH, color tempCol) {
     x = tempX;
     y = tempY;
@@ -14,18 +12,18 @@ class Cell {
     h = tempH;
     col = tempCol;
   }
-
+  
 
 
   void display() {
-    stroke(255);
+    stroke(#FFFFFF);
     fill(col);
-    rect(x+20, y+20, w, h);
+    rect(x+offset, y+offset, w, h);
   }
 
   void update(color newCol) {
-    stroke(255);
+    stroke(#FFFFFF);
     fill(newCol); 
-    rect(x+20, y+20, w, h);
+    rect(x+offset, y+offset, w, h);
   }
 }
