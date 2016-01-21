@@ -19,8 +19,8 @@ int stride = 235;
 
 void setup() {
   // setting exactly to pixelnum*5
-  // size(1175, 10);
-  size(1280, 480);
+   size(1175, 10);
+  //size(1280, 480);
   background(0);
   registry = new DeviceRegistry();
   testObserver = new TestObserver();
@@ -83,7 +83,7 @@ void draw() {
           for (int c = 0; c < cols; c ++ ) {
             color cellCol = color(grid[c][r].col);
             fill(255);
-            text(cellCol, 50, 300);
+            continue;  // WHY DO I NEED THIS?!
             //strip.setPixel(color(cellCol), stripx);
           }
         }
@@ -177,6 +177,7 @@ color weighted_get(int xpos, int ypos, int radius) {
 
 
 boolean first_scrape = true;
+
 void scrape() {
   // scrape for the strips
   loadPixels();
@@ -215,4 +216,5 @@ void scrape() {
          stripy++;
        }
   }
+  updatePixels();
 }
