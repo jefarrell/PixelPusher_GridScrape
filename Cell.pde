@@ -15,15 +15,16 @@ class Cell {
   
 
 
-  void display() {
+  void initialize() {
     stroke(#FFFFFF);
     fill(col);
-    rect(x+offset, y+offset, w, h);
+    rect(x, y, w, h);
   }
 
   void update(color newCol) {
+    col = newCol;
     stroke(#FFFFFF);
     fill(newCol); 
-    rect(x+offset, y+offset, w, h);
+    rect(x, y, w, h);
   }
 }
