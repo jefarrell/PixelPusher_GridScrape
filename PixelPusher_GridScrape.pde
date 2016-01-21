@@ -27,6 +27,7 @@ void setup() {
 
   oscP5 = new OscP5(this, 5001);
   myRemoteLocation = new NetAddress("127.0.0.1", 5001);
+  
 }
 
 
@@ -45,9 +46,10 @@ public void gridSetup() {
 
   grid = new Cell[cols][rows];
 
-  for (int i = 0; i < rows; i++) {
-    for (int j = 0; j < cols; j++) {
-      grid[j][i] = new Cell(j*(width/cols), i*(width/cols), width/cols, width/cols, #000000);
+  for (int r = 0; r < rows; r++) {
+    for (int c = 0; c < cols; c++) {
+      grid[c][r] = new Cell(c*(width/cols), r*(width/cols), width/cols, width/cols, color(0));
+      grid[c][r].display();
     }
   }
 }
@@ -60,9 +62,10 @@ void draw() {
 
   if (testObserver.hasStrips) {
     gridSetup();
-    for (int i = 0; i < rows; i ++ ) {     
-      for (int j = 0; j < cols; j ++ ) {
-        grid[j][i].display();
+    for (int r = 0; r < rows; r ++ ) {     
+      for (int c = 0; c < cols; c ++ ) {
+        //grid[c][r].display();
+        grid[3][r].update(color(255,255,255));
       }
     }
 
@@ -80,9 +83,9 @@ void draw() {
     for (Strip strip : strips) {
       int xscale = width/numStrips;
       for (int stripx = 0; stripx < strip.getLength(); stripx++) {
-        for (int i = 0; i < rows; i ++ ) {     
-          for (int j = 0; j < cols; j ++ ) {
-            strip.setPixel(grid[j][i].col, stripx);
+        for (int r = 0; r < rows; r ++ ) {     
+          for (int c = 0; c < cols; c ++ ) {
+            strip.setPixel(grid[c][r].col, stripx);
           }
         }
       }
@@ -98,12 +101,25 @@ void draw() {
 public void oscEvent(OscMessage theOscMessage) {
   List<Integer> pixelArr = new ArrayList<Integer>();
   for (int i = 0; i < theOscMessage.arguments().length; i++) {
-   int n = (Integer) theOscMessage.arguments()[i];
-   pixelArr.add(n);
+    int n = (Integer) theOscMessage.arguments()[i];
+    pixelArr.add(n);
   }
   println("////////////////////");
   println(pixelArr);
   println("////////////////////");
+
+
+  if (testObserver.hasStrips) {
+    for (Integer pix : pixelArr) {
+      int strp = pixelArr.get(0);
+      for (int r = 0; r < rows; r ++ ) {     
+        for (int c = 0; c < cols; c ++ ) {
+          //grid[pixelArr.get(pix)][strp].update(color(255, 255, 255));
+          grid[r][c].update(color(255, 255, 255));
+        }
+      }
+    }
+  }
 }
 
 
