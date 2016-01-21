@@ -27,7 +27,7 @@ void setup() {
 
   oscP5 = new OscP5(this, 5001);
   myRemoteLocation = new NetAddress("127.0.0.1", 5001);
-  
+  gridSetup();
 }
 
 
@@ -58,14 +58,15 @@ public void gridSetup() {
 
 
 void draw() {
-  background(#000000);
-
+  //background(#000000);  
   if (testObserver.hasStrips) {
-    gridSetup();
+    // gridSetup();
     for (int r = 0; r < rows; r ++ ) {     
       for (int c = 0; c < cols; c ++ ) {
-        //grid[c][r].display();
-        grid[3][r].update(color(255,255,255));
+        //grid[3][r].update(color(255,0,0));
+        fill(255);
+        textSize(75);
+        text(grid[3][r].col, 50, 300);
       }
     }
 
@@ -79,7 +80,6 @@ void draw() {
     registry.startPushing();
     List<Strip> strips = registry.getStrips();
     int numStrips = strips.size();
-
     for (Strip strip : strips) {
       int xscale = width/numStrips;
       for (int stripx = 0; stripx < strip.getLength(); stripx++) {
@@ -104,18 +104,14 @@ public void oscEvent(OscMessage theOscMessage) {
     int n = (Integer) theOscMessage.arguments()[i];
     pixelArr.add(n);
   }
-  println("////////////////////");
-  println(pixelArr);
-  println("////////////////////");
 
 
   if (testObserver.hasStrips) {
-    for (Integer pix : pixelArr) {
-      int strp = pixelArr.get(0);
+    Iterator<Integer> pixIt = pixelArr.iterator();
+    while (pixIt.hasNext()) {
       for (int r = 0; r < rows; r ++ ) {     
         for (int c = 0; c < cols; c ++ ) {
-          //grid[pixelArr.get(pix)][strp].update(color(255, 255, 255));
-          grid[r][c].update(color(255, 255, 255));
+          grid[pixIt.next()][r].update(color(255));
         }
       }
     }
@@ -124,6 +120,14 @@ public void oscEvent(OscMessage theOscMessage) {
 
 
 
+
+
+
+
+
+
+////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
 
 private void prepareExitHandler () {
   Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
