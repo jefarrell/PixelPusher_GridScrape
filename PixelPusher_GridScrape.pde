@@ -17,7 +17,6 @@ int cols;
 int stride = 235; // NEEDS TO BE EXACT PIXEL# FROM CONFIG
 
 
-
 public void gridSetup() {
   List<Strip> strips = registry.getStrips();
   for (Strip strip : strips) {
@@ -34,7 +33,6 @@ public void gridSetup() {
   for (int r = 0; r < rows; r++) {
     for (int c = 0; c < cols; c++) {
       grid[c][r] = new Cell(c*(width/cols), r*(width/cols), width/cols, width/cols, color(0));
-      grid[c][r].initialize();
     }
   }
 }
@@ -53,7 +51,8 @@ void setup() {
 
   oscP5 = new OscP5(this, 5001);
   myRemoteLocation = new NetAddress("127.0.0.1", 5001);
-  gridSetup();  // Draw the initial grid
+  
+  gridSetup();  
 }
 
 
@@ -64,54 +63,39 @@ void setup() {
 void draw() {
   if (testObserver.hasStrips) {
     registry.startPushing();
-    // I truly don't know why this part is needed...
-    List<Strip> strips = registry.getStrips();
-    int numStrips = strips.size();
-    for (Strip strip : strips) {
-      for (int stripx = 0; stripx < strip.getLength(); stripx++) {
-        for (int r = 0; r < rows; r ++ ) {     
-          for (int c = 0; c < cols; c ++ ) {
-            color cellCol = color(grid[c][r].col);
-            fill(255);
-            continue;
-          }
-        }
-      }
+  }
+  for (int r = 0; r < rows; r ++ ) {     
+    for (int c = 0; c < cols; c ++ ) {
+      grid[c][r].initialize();
     }
   }
   scrape();
 }
 
-public void test(ArrayList<Integer> pxl) {
-  
-}
 
 // Need to establish OSC protocol (strip,pixls,cols), set matching grid squares
 public void oscEvent(OscMessage theOscMessage) {
-
-  println("NOW HEREEEEEEEEEEE");
-  List<Integer> pixelArr = new ArrayList<Integer>();
+  
+  ArrayList<Integer> pixelArr = new ArrayList<Integer>();
   int stripn = theOscMessage.get(0).intValue();
 
+  // Add the OSC messages to our arrayList
   for (int i = 0; i < theOscMessage.arguments().length; i++) {
     int n = (Integer) theOscMessage.arguments()[i];
     pixelArr.add(n);
   }
 
-  println("////////////////////////////////////");
-  println(pixelArr);
-  println("////////////////////////////////////");
-
-
-  if (testObserver.hasStrips) {
-    Iterator<Integer> pixItr = pixelArr.iterator(); 
-    for (int r = 0; r < rows; r++) {
-      for (int c = 0; c < cols; c++) {
-        while (pixItr.hasNext()) { 
-          grid[pixItr.next()][stripn].update(color(255));
-        }
-      }
+  // Reset the grid
+  for (int r = 0; r < rows; r++) {
+    for (int c = 0; c < cols; c++) {
+      grid[c][r].update(color(0));
     }
+  }
+
+  // Set the grid to the coordinates we got via OSC
+  Iterator<Integer> pixItr = pixelArr.iterator(); 
+  while (pixItr.hasNext()) { 
+    grid[pixItr.next()][stripn].update(color(255));
   }
 }
 
