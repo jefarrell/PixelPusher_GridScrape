@@ -73,7 +73,7 @@ void draw() {
           for (int c = 0; c < cols; c ++ ) {
             color cellCol = color(grid[c][r].col);
             fill(255);
-            continue;  
+            continue;
           }
         }
       }
@@ -82,12 +82,17 @@ void draw() {
   scrape();
 }
 
+public void test(ArrayList<Integer> pxl) {
+  
+}
 
 // Need to establish OSC protocol (strip,pixls,cols), set matching grid squares
 public void oscEvent(OscMessage theOscMessage) {
+
+  println("NOW HEREEEEEEEEEEE");
   List<Integer> pixelArr = new ArrayList<Integer>();
   int stripn = theOscMessage.get(0).intValue();
-  
+
   for (int i = 0; i < theOscMessage.arguments().length; i++) {
     int n = (Integer) theOscMessage.arguments()[i];
     pixelArr.add(n);
