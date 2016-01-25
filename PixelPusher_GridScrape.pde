@@ -25,10 +25,11 @@ public void gridSetup() {
     rows = strips.size();
   }
 
-  /* //Offline mode
-   cols = 235;
-   rows = 20;
-   */
+  // Offline mode
+  //cols = 235;
+  //rows = 20;
+
+
   grid = new Cell[cols][rows];
   for (int r = 0; r < rows; r++) {
     for (int c = 0; c < cols; c++) {
@@ -42,9 +43,8 @@ public void gridSetup() {
 
 
 void setup() {
-  // setting exactly to pixelnum*5  -> SEEMS IMPORTANT
+  // width must be stripLength * 5, height must be numStrips * 5
   size(1175, 10); 
-  //size(1280, 480);
   background(0);
   registry = new DeviceRegistry();
   testObserver = new TestObserver();
@@ -53,7 +53,7 @@ void setup() {
 
   oscP5 = new OscP5(this, 5001);
   myRemoteLocation = new NetAddress("127.0.0.1", 5001);
-  gridSetup();  // Initial grid
+  gridSetup();  // Draw the initial grid
 }
 
 
@@ -63,10 +63,8 @@ void setup() {
 
 void draw() {
   if (testObserver.hasStrips) {
-
-    // this should just scrape the color from the displayed grid // ACTUALLY NOT ANYMORE
-    // will set the colors initially with display() then again with update() on OSC event
     registry.startPushing();
+    // I truly don't know why this part is needed...
     List<Strip> strips = registry.getStrips();
     int numStrips = strips.size();
     for (Strip strip : strips) {
@@ -75,8 +73,7 @@ void draw() {
           for (int c = 0; c < cols; c ++ ) {
             color cellCol = color(grid[c][r].col);
             fill(255);
-            continue;  // WHY DO I NEED THIS?!
-            //strip.setPixel(color(cellCol), stripx);
+            continue;  
           }
         }
       }
@@ -88,10 +85,9 @@ void draw() {
 
 // Need to establish OSC protocol (strip,pixls,cols), set matching grid squares
 public void oscEvent(OscMessage theOscMessage) {
-
-  int stripn = theOscMessage.get(0).intValue();
   List<Integer> pixelArr = new ArrayList<Integer>();
-
+  int stripn = theOscMessage.get(0).intValue();
+  
   for (int i = 0; i < theOscMessage.arguments().length; i++) {
     int n = (Integer) theOscMessage.arguments()[i];
     pixelArr.add(n);

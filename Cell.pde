@@ -13,18 +13,17 @@ class Cell {
     col = tempCol;
   }
   
-
-
   void initialize() {
-    stroke(#FFFFFF);
+    stroke(255);
     fill(col);
     rect(x, y, w, h);
   }
 
   void update(color newCol) {
     col = newCol;
-    stroke(#FFFFFF);
+    noStroke();
     fill(newCol); 
     rect(x, y, w, h);
   }
+  
 }
