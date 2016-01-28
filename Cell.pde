@@ -1,8 +1,10 @@
 class Cell {
+  
   float x, y;
   float w, h;
   float angle;
   color col;
+  int thing = 0;
 
   Cell(float tempX, float tempY, float tempW, float tempH, color tempCol) {
     x = tempX;
@@ -20,7 +22,7 @@ class Cell {
 
   void update(color newCol) {
     col = newCol;
-    fill(col);   
+    fill(col);
   }
-
+  
 }

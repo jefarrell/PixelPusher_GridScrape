@@ -14,7 +14,7 @@ NetAddress myRemoteLocation;
 
 int rows;
 int cols;
-int stride = 235; // NEEDS TO BE EXACT PIXEL# FROM CONFIG
+int stride = 235; // NEEDS TO BE EXACT PIXEL-PER-STRIP# FROM CONFIG
 
 
 public void gridSetup() {
@@ -28,7 +28,6 @@ public void gridSetup() {
   //cols = 235;
   //rows = 20;
 
-
   grid = new Cell[cols][rows];
   for (int r = 0; r < rows; r++) {
     for (int c = 0; c < cols; c++) {
@@ -39,31 +38,23 @@ public void gridSetup() {
 
 
 
-
 void setup() {
   // width must be stripLength * 5, height must be numStrips * 5
   size(1175, 10); 
   background(0);
+
   registry = new DeviceRegistry();
   testObserver = new TestObserver();
   registry.addObserver(testObserver);
   prepareExitHandler();
-
   oscP5 = new OscP5(this, 5001);
-  myRemoteLocation = new NetAddress("127.0.0.1", 5001);
-  
-  gridSetup();  
+
+  gridSetup();
 }
 
 
 
-
-
-
 void draw() {
-  if (testObserver.hasStrips) {
-    registry.startPushing();
-  }
   for (int r = 0; r < rows; r ++ ) {     
     for (int c = 0; c < cols; c ++ ) {
       grid[c][r].initialize();
@@ -73,13 +64,12 @@ void draw() {
 }
 
 
-// Need to establish OSC protocol (strip,pixls,cols), set matching grid squares
-public void oscEvent(OscMessage theOscMessage) {
-  
+
+public void oscEvent(OscMessage theOscMessage) {  
   ArrayList<Integer> pixelArr = new ArrayList<Integer>();
   int stripn = theOscMessage.get(0).intValue();
 
-  // Add the OSC messages to our arrayList
+  // Add the OSC message arguments to our arrayList
   for (int i = 0; i < theOscMessage.arguments().length; i++) {
     int n = (Integer) theOscMessage.arguments()[i];
     pixelArr.add(n);
@@ -92,12 +82,13 @@ public void oscEvent(OscMessage theOscMessage) {
     }
   }
 
-  // Set the grid to the coordinates we got via OSC
+  // Update the grid with numbers we got via OSC
   Iterator<Integer> pixItr = pixelArr.iterator(); 
   while (pixItr.hasNext()) { 
     grid[pixItr.next()][stripn].update(color(255));
   }
 }
+
 
 
 boolean first_scrape = true;
@@ -133,7 +124,7 @@ void scrape() {
         }
 
         color c = 0;
-        c=get(xpos+1, ypos+1);  
+        c=get(xpos+1, ypos+1);
         strip.setPixel(c, stripx);
       }
       stripy++;
@@ -141,13 +132,6 @@ void scrape() {
   }
   updatePixels();
 }
-
-
-
-
-
-
-
 
 
 
