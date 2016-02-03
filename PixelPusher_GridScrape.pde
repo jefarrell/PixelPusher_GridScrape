@@ -17,7 +17,6 @@ int cols;
 int stride = 235; // NEEDS TO BE EXACT PIXEL-PER-STRIP# FROM CONFIG
 
 // Hashmap - this will store all pixel-color combos
-// Can be int because it's monochrome color (0-255)
 HashMap<Integer, Integer> pixelCols = new HashMap<Integer, Integer>();
 
 public void gridSetup() {
@@ -92,21 +91,24 @@ public void oscEvent(OscMessage theOscMessage) {
   // where to go based on address
   switch(addr) {
   case "/new": 
-    println("new strips incoming");
     pixelCols.clear();
-    for (int i = 0; i < pixelArr.size(); i++) {
-      pixelCols.put(pixelArr.get(i), colorArr.get(i));
-    }
-    break;
-  case "/continue": 
-    println("continue lighting");
+    wholeGrid(false);
     for (int i = 0; i < pixelArr.size(); i++) {
       pixelCols.put(pixelArr.get(i), colorArr.get(i));
     }
     colorGrid(stripNum);
     break;
-  case "/allon": 
-    println("all lights on");
+  case "/continue": 
+    for (int i = 0; i < pixelArr.size(); i++) {
+      pixelCols.put(pixelArr.get(i), colorArr.get(i));
+    }
+    colorGrid(stripNum);
+    break;
+  case "/allon":
+    wholeGrid(true);
+    break;
+  case "/alloff":
+    wholeGrid(false);
     break;
   }
 
@@ -127,10 +129,16 @@ public void colorGrid(int stripN) {
 
 
 // clear hashmap too!
-public void resetGrid() {
+public void wholeGrid(boolean state) {
+  color status;
+  if(state) {
+   status = color(255); 
+  } else {
+   status = color(0); 
+  }
   for (int r = 0; r < rows; r++) {
     for (int c = 0; c < cols; c++) {
-      grid[c][r].update(color(0));
+      grid[c][r].update(status);
     }
   }
 }
@@ -182,10 +190,7 @@ void scrape() {
 
         color c = 0;
         c=get(xpos+1, ypos+1);
-        //strip.setPixel(c, stripx);
-        for (int i =0; i<strip.getLength(); i++) {
-          strips.get(0).setPixel(255, i);
-        }
+        strip.setPixel(c, stripx);
       }
       stripy++;
     }
