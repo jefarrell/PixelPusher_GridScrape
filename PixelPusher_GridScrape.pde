@@ -25,11 +25,9 @@ public void gridSetup() {
     cols = strip.getLength();
     rows = strips.size();
   }
-
-  // Offline mode
-  //cols = 235;
-  //rows = 20;
-
+          // Offline mode
+          //cols = 235;
+          //rows = 20;
   grid = new Cell[cols][rows];
   for (int r = 0; r < rows; r++) {
     for (int c = 0; c < cols; c++) {
@@ -85,10 +83,8 @@ public void oscEvent(OscMessage theOscMessage) {
     }
   }
 
-
-
-
-  // where to go based on address
+  // Cases for where to go based on address
+  //// Options : new, continue, allOn, allOff
   switch(addr) {
   case "/new": 
     pixelCols.clear();
@@ -104,18 +100,16 @@ public void oscEvent(OscMessage theOscMessage) {
     }
     colorGrid(stripNum);
     break;
-  case "/allon":
+  case "/allOn":
     wholeGrid(true);
     break;
-  case "/alloff":
+  case "/allOff":
     wholeGrid(false);
     break;
   }
-
-  println(pixelCols);
 }
 
-//// Read hashmap, update grid colors
+// Read hashmap, update grid colors
 public void colorGrid(int stripN) {
   for (Map.Entry<Integer, Integer> entry : pixelCols.entrySet()) {
     int pixLoc = entry.getKey();
@@ -126,13 +120,11 @@ public void colorGrid(int stripN) {
   }
 }
 
-
-
-// clear hashmap too!
+// Turn the grid all on or off
 public void wholeGrid(boolean state) {
   color status;
   if(state) {
-   status = color(255); 
+   status = color(100); 
   } else {
    status = color(0); 
   }
@@ -142,12 +134,6 @@ public void wholeGrid(boolean state) {
     }
   }
 }
-
-
-
-
-
-
 
 
 
