@@ -16,6 +16,9 @@ int rows;
 int cols;
 int stride = 235; // NEEDS TO BE EXACT PIXEL-PER-STRIP# FROM CONFIG
 
+// Hashmap - this will store all pixel-color combos
+// Can be int because it's monochrome color (0-255)
+HashMap<Integer, Integer> pixelCols = new HashMap<Integer, Integer>();
 
 public void gridSetup() {
   List<Strip> strips = registry.getStrips();
@@ -64,33 +67,87 @@ void draw() {
 }
 
 
-
+// OSC protocol
+//// Address is usecase flag
+//// Arguments: [strip#, pixel, color, pixel, color, pixel...]
 public void oscEvent(OscMessage theOscMessage) {  
+  int stripNum = theOscMessage.get(0).intValue();
+  String addr = theOscMessage.addrPattern();
   ArrayList<Integer> pixelArr = new ArrayList<Integer>();
-  int stripn = theOscMessage.get(0).intValue();
+  ArrayList<Integer> colorArr = new ArrayList<Integer>();
 
-  // Add the OSC message arguments to our arrayList
-  for (int i = 0; i < theOscMessage.arguments().length; i++) {
-    int n = (Integer) theOscMessage.arguments()[i];
-    pixelArr.add(n);
-  }
-
-  // Reset the grid
-  for (int r = 0; r < rows; r++) {
-    for (int c = 0; c < cols; c++) {
-      grid[c][r].update(color(0));
+  // Split arguments into pixel and color silos
+  for (int i = 1; i < theOscMessage.arguments().length; i++) {
+    int val = (Integer) theOscMessage.arguments()[i];
+    if (i % 2 != 0) {
+      pixelArr.add(val);
+    } else {
+      colorArr.add(val);
     }
   }
 
-  // Update the grid with numbers we got via OSC
-  Iterator<Integer> pixItr = pixelArr.iterator(); 
-  while (pixItr.hasNext()) { 
-    grid[pixItr.next()][stripn].update(color(255));
+
+
+
+  // where to go based on address
+  switch(addr) {
+  case "/new": 
+    println("new strips incoming");
+    pixelCols.clear();
+    for (int i = 0; i < pixelArr.size(); i++) {
+      pixelCols.put(pixelArr.get(i), colorArr.get(i));
+    }
+    break;
+  case "/continue": 
+    println("continue lighting");
+    for (int i = 0; i < pixelArr.size(); i++) {
+      pixelCols.put(pixelArr.get(i), colorArr.get(i));
+    }
+    colorGrid(stripNum);
+    break;
+  case "/allon": 
+    println("all lights on");
+    break;
+  }
+
+  println(pixelCols);
+}
+
+//// Read hashmap, update grid colors
+public void colorGrid(int stripN) {
+  for (Map.Entry<Integer, Integer> entry : pixelCols.entrySet()) {
+    int pixLoc = entry.getKey();
+    int pixCol = entry.getValue();
+    grid[pixLoc][stripN].update(pixCol);
+    println("pix: " + pixLoc);
+    println("col: " + pixCol);
   }
 }
 
 
 
+// clear hashmap too!
+public void resetGrid() {
+  for (int r = 0; r < rows; r++) {
+    for (int c = 0; c < cols; c++) {
+      grid[c][r].update(color(0));
+    }
+  }
+}
+
+
+
+
+
+
+
+
+
+/*
+
+ Screen Scraper
+ 
+ */
 boolean first_scrape = true;
 
 void scrape() {
@@ -125,7 +182,10 @@ void scrape() {
 
         color c = 0;
         c=get(xpos+1, ypos+1);
-        strip.setPixel(c, stripx);
+        //strip.setPixel(c, stripx);
+        for (int i =0; i<strip.getLength(); i++) {
+          strips.get(0).setPixel(255, i);
+        }
       }
       stripy++;
     }
