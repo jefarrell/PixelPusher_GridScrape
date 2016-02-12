@@ -7,12 +7,14 @@ ___
 ####Basic Structure
 >Program draws grid based on number of strips and pixels per strip, based on numbers defined in pixel.rc configuration file.  Program takes OSC message containing strip and pixel information.  Corresponding cells are turned to desired color.  Grid is then scraped for color, which is sent to PixelPusher.
 
-___
-####Setup Necessary
+
+####Necessary Setup
 Processing v3 does not allow for variables in size(), so the sketch won't exactly auto-configure.  There are 3 variables that must be manually set, all in PixelPusher_GridScrape.pde - these should all match what is written in the pixel.rc file
 
 **int stride** on line 17 must be set to the Pixels Per Strip number
+
 **size width** on line 43 must be stripLength
+
 **size height** on line 43 must be numStrips
 
 I multiplity both by 5 to get a visible grid that will fit on the screen - this number can be adjusted depending on your number of strips and pixels per strip.
