@@ -5,9 +5,8 @@ ___
 Application to light specific pixels on LED strips using the Heroic Robotics [PixelPusher](www.heroicrobotics.com/products/pixelpusher).  
 ___
 ####Basic Structure
->Program draws grid based on number of strips and pixels per strip, based on numbers defined in pixel.rc configuration file.  Program takes OSC message containing strip and pixel information.  Corresponding cells are turned to desired color.  Grid is then scraped for color, which is sent to PixelPusher.
-
-
+Program draws grid based on number of strips and pixels per strip, based on numbers defined in pixel.rc configuration file.  Program takes OSC message containing strip and pixel information.  Corresponding cells are turned to desired color.  Grid is then scraped for color, which is sent to PixelPusher.
+___
 ####Necessary Setup
 Processing v3 does not allow for variables in size(), so the sketch won't exactly auto-configure.  There are 3 variables that must be manually set, all in PixelPusher_GridScrape.pde - these should all match what is written in the pixel.rc file
 
