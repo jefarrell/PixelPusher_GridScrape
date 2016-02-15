@@ -19,15 +19,22 @@ int stride = 235; // NEEDS TO BE EXACT PIXEL-PER-STRIP# FROM CONFIG
 // Hashmap - this will store all pixel-color combos
 HashMap<Integer, Integer> pixelCols = new HashMap<Integer, Integer>();
 
+
+Map<Integer, ArrayList<Integer>> box = new HashMap<Integer, ArrayList<Integer>>();
+//ArrayList<ArrayList<Integer>> Container = new ArrayList<ArrayList<Integer>>();
+int counter;
+
+
+
 public void gridSetup() {
   List<Strip> strips = registry.getStrips();
   for (Strip strip : strips) {
     cols = strip.getLength();
     rows = strips.size();
   }
-          // Offline mode
-          //cols = 235;
-          //rows = 20;
+  // Offline mode
+  //cols = 235;
+  //rows = 20;
   grid = new Cell[cols][rows];
   for (int r = 0; r < rows; r++) {
     for (int c = 0; c < cols; c++) {
@@ -68,37 +75,20 @@ void draw() {
 //// Address is usecase flag
 //// Arguments: [strip#, pixel, color, pixel, color, pixel...]
 public void oscEvent(OscMessage theOscMessage) {  
-  int stripNum = theOscMessage.get(0).intValue();
+
+  ArrayList<Integer> vals = new ArrayList<Integer>();
   String addr = theOscMessage.addrPattern();
-  ArrayList<Integer> pixelArr = new ArrayList<Integer>();
-  ArrayList<Integer> colorArr = new ArrayList<Integer>();
-
-  // Split arguments into pixel and color silos
-  for (int i = 1; i < theOscMessage.arguments().length; i++) {
-    int val = (Integer) theOscMessage.arguments()[i];
-    if (i % 2 != 0) {
-      pixelArr.add(val);
-    } else {
-      colorArr.add(val);
-    }
-  }
-
   // Cases for where to go based on address
-  //// Options : new, continue, allOn, allOff
+  //// Options : pixels, allOn, allOff, end 
   switch(addr) {
   case "/new": 
-    pixelCols.clear();
-    wholeGrid(false);
-    for (int i = 0; i < pixelArr.size(); i++) {
-      pixelCols.put(pixelArr.get(i), colorArr.get(i));
+    for (int i = 0; i < theOscMessage.arguments().length; i++) {
+      int nums = (Integer) theOscMessage.arguments()[i];
+      vals.add(nums);
     }
-    colorGrid(stripNum);
-    break;
-  case "/continue": 
-    for (int i = 0; i < pixelArr.size(); i++) {
-      pixelCols.put(pixelArr.get(i), colorArr.get(i));
-    }
-    colorGrid(stripNum);
+    box.put(counter, vals);
+    counter++;
+    println(box);
     break;
   case "/allOn":
     wholeGrid(true);
@@ -106,27 +96,57 @@ public void oscEvent(OscMessage theOscMessage) {
   case "/allOff":
     wholeGrid(false);
     break;
+  case "/end":
+    containerParse(box);
+    //colorGrid(stripNum);
+    break;
+  }
+}
+
+
+
+public void containerParse(Map<Integer, ArrayList<Integer>> pixelContainer) {
+  ////for arraylist in arraylist
+  //int stripNum = theOscMessage.get(0).intValue();
+  ArrayList<Integer> pixelArr = new ArrayList<Integer>();
+  ArrayList<Integer> colorArr = new ArrayList<Integer>();
+
+  //// Split map into pixel and color silos
+  for (Map.Entry m : pixelContainer.entrySet ()) {
+    ArrayList<Integer> combos = (ArrayList<Integer>)m.getValue();
+    int stripNum = combos.get(0);
+    for (int i = 1; i < combos.size(); i++) {
+      int val = combos.get(i);
+      if (i % 2 != 0) {
+        pixelArr.add(val);
+      } else {
+        colorArr.add(val);
+      }
+    }
+    for (int i = 0; i < pixelArr.size(); i++) {
+      pixelCols.put(pixelArr.get(i), colorArr.get(i));
+    }
+    colorGrid(stripNum);
   }
 }
 
 // Read hashmap, update grid colors
 public void colorGrid(int stripN) {
+  println("///// here" );
   for (Map.Entry<Integer, Integer> entry : pixelCols.entrySet()) {
-    int pixLoc = entry.getKey();
-    int pixCol = entry.getValue();
-    grid[pixLoc][stripN].update(pixCol);
-    println("pix: " + pixLoc);
-    println("col: " + pixCol);
+   int pixLoc = entry.getKey();
+   int pixCol = entry.getValue();
+   // grid[pixLoc][stripN].update(pixCol);  // not working until I have the physical setup
   }
 }
 
 // Turn the grid all on or off
 public void wholeGrid(boolean state) {
   color status;
-  if(state) {
-   status = color(100); 
+  if (state) {
+    status = color(100);
   } else {
-   status = color(0); 
+    status = color(0);
   }
   for (int r = 0; r < rows; r++) {
     for (int c = 0; c < cols; c++) {
