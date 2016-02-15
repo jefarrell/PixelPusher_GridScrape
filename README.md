@@ -17,20 +17,22 @@ Processing v3 does not allow for variables in size(), so the sketch won't exactl
 
 **size height** on line 43 must be numStrips
 
-I multiplity both by 5 to get a visible grid that will fit on the screen - this number can be adjusted depending on your number of strips and pixels per strip.
+I multiplity height and width by 5 to get a visible grid that will fit on the screen - this number can be adjusted depending on your number of strips and pixels per strip.
 
 ___
 ####OSC Protocol
 Processing sketch is built to receive messages via OSC.  
->OSC messages should be addressed with either "/new", "/continue", "allOn" or "allOff"
+>OSC messages should be addressed with either "/pixels", "allOn", "allOff", or "/end"
 >
->**/new** means "Reset the grid, then light up whatever pixels we received"
+>The program will take as many messages as it needs at "/pixels", but then must receive a message at "/end" to light the grid
 >
->**/continue** means "Leave previous lights on, add the pixels we received to the grid"
+>**/pixels** is for any message containing a array of strip number, pixels and colors (see below).  Multiple can be sent before an "/end" message
 >
 >**/allOn** means turn entire grid on
 >
 >**/allOff** means... turn entire grid off
+>
+>**/end** must be sent at the end of a OSC sequence.  This will color the grid, and light physical pixels
 >
 >Argument structure of OSC messages should be [strip number, pixel, color, pixel, color... etc]
 >
