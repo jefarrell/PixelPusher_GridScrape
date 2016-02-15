@@ -11,11 +11,11 @@ ___
 ####Necessary Setup
 Processing v3 does not allow for variables in size(), so the sketch won't exactly auto-configure.  There are 3 variables that must be manually set, all in PixelPusher_GridScrape.pde - these should all match what is written in the pixel.rc file
 
-**int stride** on line 17 must be set to the Pixels Per Strip number
++ **int stride** on line 17 must be set to the Pixels Per Strip number
 
-**size width** on line 43 must be stripLength
++ **size width** on line 43 must be stripLength
 
-**size height** on line 43 must be numStrips
++ **size height** on line 43 must be numStrips
 
 I multiplity height and width by 5 to get a visible grid that will fit on the screen - this number can be adjusted depending on your number of strips and pixels per strip.
 
