@@ -18,10 +18,10 @@ int stride = 235; // NEEDS TO BE EXACT PIXEL-PER-STRIP# FROM CONFIG
 
 // Hashmap - this will store all pixel-color combos
 HashMap<Integer, Integer> pixelCols = new HashMap<Integer, Integer>();
-
-
+ArrayList<Integer> pixelArr = new ArrayList<Integer>();
+ArrayList<Integer> colorArr = new ArrayList<Integer>();
+// Hashmap to store all incoming messages until we get an "/end" message
 Map<Integer, ArrayList<Integer>> box = new HashMap<Integer, ArrayList<Integer>>();
-//ArrayList<ArrayList<Integer>> Container = new ArrayList<ArrayList<Integer>>();
 int counter;
 
 
@@ -78,40 +78,43 @@ public void oscEvent(OscMessage theOscMessage) {
 
   ArrayList<Integer> vals = new ArrayList<Integer>();
   String addr = theOscMessage.addrPattern();
-  // Cases for where to go based on address
-  //// Options : pixels, allOn, allOff, end 
+  // Actions to take based on incoming message address
+  // Options : pixels, allOn, allOff, end 
   switch(addr) {
-  case "/new": 
+    // Most important - add messages to a hashmap, will be used later
+  case "/pixels": 
     for (int i = 0; i < theOscMessage.arguments().length; i++) {
       int nums = (Integer) theOscMessage.arguments()[i];
       vals.add(nums);
     }
     box.put(counter, vals);
     counter++;
-    println(box);
     break;
+    // Turn whole grid on
   case "/allOn":
     wholeGrid(true);
     break;
+    // Turn whole grid off
   case "/allOff":
     wholeGrid(false);
     break;
+    // Ending transmission - parse hashmap, update grid, light pixels
   case "/end":
+    wholeGrid(false);
     containerParse(box);
-    //colorGrid(stripNum);
+    // Reset our bins for the next message
+    pixelCols.clear();
+    pixelArr.clear();
+    colorArr.clear();
+    box.clear();
     break;
   }
 }
 
 
-
+// Parse all of the pixel messages we got, called after receiving an "end" message
 public void containerParse(Map<Integer, ArrayList<Integer>> pixelContainer) {
-  ////for arraylist in arraylist
-  //int stripNum = theOscMessage.get(0).intValue();
-  ArrayList<Integer> pixelArr = new ArrayList<Integer>();
-  ArrayList<Integer> colorArr = new ArrayList<Integer>();
-
-  //// Split map into pixel and color silos
+  // Split map into pixel and color silos
   for (Map.Entry m : pixelContainer.entrySet ()) {
     ArrayList<Integer> combos = (ArrayList<Integer>)m.getValue();
     int stripNum = combos.get(0);
@@ -130,13 +133,13 @@ public void containerParse(Map<Integer, ArrayList<Integer>> pixelContainer) {
   }
 }
 
+
 // Read hashmap, update grid colors
 public void colorGrid(int stripN) {
-  println("///// here" );
   for (Map.Entry<Integer, Integer> entry : pixelCols.entrySet()) {
-   int pixLoc = entry.getKey();
-   int pixCol = entry.getValue();
-   // grid[pixLoc][stripN].update(pixCol);  // not working until I have the physical setup
+    int pixLoc = entry.getKey();
+    int pixCol = entry.getValue();
+    grid[pixLoc][stripN].update(pixCol);  // not working until I have the physical setup
   }
 }
 
@@ -157,11 +160,7 @@ public void wholeGrid(boolean state) {
 
 
 
-/*
-
- Screen Scraper
- 
- */
+// Screen scraper function
 boolean first_scrape = true;
 
 void scrape() {
